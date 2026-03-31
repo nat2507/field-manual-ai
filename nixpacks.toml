@@ -3,9 +3,9 @@ nixPkgs = ["nodejs_20", "python312"]
 
 [phases.install]
 cmds = [
-  "cd backend && npm install",
+  "npm install --prefix backend",
   "pip install -r backend/requirements.txt"
 ]
 
 [start]
-cmd = "cd backend && node server.js"
+cmd = "node backend/server.js"
