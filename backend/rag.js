@@ -13,7 +13,7 @@ import fs from 'fs';
 const vectorStore = [];
 const sectionIndex = [];
 
-const VECTORS_FILE = "C:\\manuals\\vectors.json";
+const VECTORS_FILE = process.env.VECTORS_FILE || "C:\\manuals\\vectors.json";
 
 // ─────────────────────────────────────────────
 // VECTOR PERSISTENCE

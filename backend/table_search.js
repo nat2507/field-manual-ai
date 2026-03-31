@@ -6,7 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const TABLES_FILE = "C:\\manuals\\tables.json";
+const TABLES_FILE = process.env.TABLES_FILE || "C:\\manuals\\tables.json";
 
 // Load all table data
 export function loadTableData() {
