@@ -1,0 +1,2 @@
+pdfplumber==0.11.9
+pillow>=9.1
