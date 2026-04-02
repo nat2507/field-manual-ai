@@ -202,6 +202,7 @@ function saveCorrections(corrections) {
 
 function findCorrection(question) {
   const corrections = loadCorrections();
+  console.log(`   [DEBUG] Checking ${corrections.length} corrections for: "${question}"`);
   const qLower = question.toLowerCase();
   // Only use corrections that aren't rejected
   return corrections.find(c => {
