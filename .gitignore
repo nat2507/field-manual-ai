@@ -39,5 +39,8 @@ backend/manuals/tables.json
 backend/manuals/corrections.json
 C:/manuals/vectors.json
 C:/manuals/tables.json
- 
+
+# Explicitly allow frontend build in backend
+!backend/public/
+!backend/public/**
  

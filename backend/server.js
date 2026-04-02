@@ -850,12 +850,17 @@ app.get("/health", (_, res) => res.json({ status: "ok", documents: getIndexedDoc
 // SERVE FRONTEND
 // ─────────────────────────────────────────────
 const FRONTEND_PATH = path.join(__dirname, "public");
+console.log(`[DEBUG] __dirname: ${__dirname}`);
+console.log(`[DEBUG] FRONTEND_PATH: ${FRONTEND_PATH}`);
+console.log(`[DEBUG] Frontend exists: ${fs.existsSync(FRONTEND_PATH)}`);
 if (fs.existsSync(FRONTEND_PATH)) {
   app.use(express.static(FRONTEND_PATH));
   app.get("*", (_, res) => {
     res.sendFile(path.join(FRONTEND_PATH, "index.html"));
   });
   console.log(`[OK] Serving frontend from ${FRONTEND_PATH}`);
+} else {
+  console.log(`[WARN] Frontend not found at ${FRONTEND_PATH}`);
 }
 
 app.listen(PORT, async () => {
