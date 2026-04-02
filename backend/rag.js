@@ -30,7 +30,7 @@ export function saveVectors() {
       sectionIndex,
     };
     fs.writeFileSync(VECTORS_FILE, JSON.stringify(data));
-    console.log(`[VECTORS] Saved ${vectorStore.length} vectors to disk`);
+    console.log(`[VECTORS] Saved ${vectorStore.length} vectors to disk at ${VECTORS_FILE}`);
   } catch (err) {
     console.log(`[WARN] Could not save vectors: ${err.message}`);
   }
@@ -48,7 +48,7 @@ export function loadVectors() {
     vectorStore.push(...data.vectorStore);
     sectionIndex.push(...(data.sectionIndex || []));
 
-    console.log(`[VECTORS] Loaded ${vectorStore.length} vectors from disk (saved ${data.savedAt})`);
+    console.log(`[VECTORS] Loaded ${vectorStore.length} vectors from disk at ${VECTORS_FILE} (saved ${data.savedAt})`);
     return true;
   } catch (err) {
     console.log(`[WARN] Could not load vectors: ${err.message}`);
