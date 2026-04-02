@@ -14,8 +14,6 @@ const vectorStore = [];
 const sectionIndex = [];
 
 const VECTORS_FILE = process.env.VECTORS_FILE || "C:\\manuals\\vectors.json";
-console.log(`[DEBUG] VECTORS_FILE env: ${process.env.VECTORS_FILE}`);
-console.log(`[DEBUG] VECTORS_FILE actual: ${VECTORS_FILE}`);
 
 // ─────────────────────────────────────────────
 // VECTOR PERSISTENCE
@@ -188,7 +186,7 @@ export function chunkText(text, totalPages = 1, { chunkSize = 300, overlap = 60 
 // Real ML embeddings via Voyage AI
 // voyage-3 is optimised for technical documents
 // ─────────────────────────────────────────────
-async function embedText(text) {
+export async function embedText(text) {
   return embedBatch([text]).then(vectors => vectors[0]);
 }
 
@@ -251,7 +249,7 @@ function localEmbedText(text) {
 // ─────────────────────────────────────────────
 // COSINE SIMILARITY
 // ─────────────────────────────────────────────
-function cosineSimilarity(a, b) {
+export function cosineSimilarity(a, b) {
   if (!a || !b || a.length !== b.length) return 0;
   let dot = 0, magA = 0, magB = 0;
   for (let i = 0; i < a.length; i++) {

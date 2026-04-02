@@ -20,6 +20,8 @@ import {
   saveVectors,
   loadVectors,
   getVectorFilenames,
+  embedText,
+  cosineSimilarity,
 } from "./rag.js";
 import { saveTableData, searchTables, formatTableAnswer } from "./table_search.js";
 
@@ -200,17 +202,30 @@ function saveCorrections(corrections) {
   } catch (err) {}
 }
 
-function findCorrection(question) {
+async function findCorrection(question) {
   const corrections = loadCorrections();
-  console.log(`   [DEBUG] Checking ${corrections.length} corrections for: "${question}"`);
-  const qLower = question.toLowerCase();
-  // Only use corrections that aren't rejected
-  return corrections.find(c => {
-    if (c.confidence === 'rejected') return false;
-    const cWords = c.question.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-    const matches = cWords.filter(w => qLower.includes(w)).length;
-    return matches >= Math.ceil(cWords.length * 0.6);
-  }) || null;
+  const active = corrections.filter(c => c.confidence !== 'rejected');
+  if (active.length === 0) return null;
+  try {
+    const qEmbedding = await embedText(question);
+    if (!qEmbedding) return null;
+    let bestMatch = null;
+    let bestScore = 0;
+    for (const c of active) {
+      if (!c.embedding) c.embedding = await embedText(c.question);
+      if (!c.embedding) continue;
+      const score = cosineSimilarity(qEmbedding, c.embedding);
+      if (score > bestScore) { bestScore = score; bestMatch = c; }
+    }
+    if (bestScore >= 0.85) {
+      console.log(`   [CORRECTION] Semantic match: ${bestScore.toFixed(3)} → "${bestMatch.question}"`);
+      return bestMatch;
+    }
+    return null;
+  } catch (err) {
+    console.log(`   [WARN] Correction semantic match failed: ${err.message}`);
+    return null;
+  }
 }
 
 async function addCorrection(question, answer, filename, page) {
@@ -505,7 +520,7 @@ app.post("/chat", async (req, res) => {
     }
 
     // ── CHECK CORRECTIONS FIRST (before table search) ──
-    const correction = findCorrection(question);
+    const correction = await findCorrection(question);
     if (correction) {
       console.log(`   [CORRECTION] Using saved answer (${correction.confidence})`);
       const disclaimer = correction.confidence === 'pending'
@@ -659,6 +674,8 @@ Personality:
 - Never volunteer extra information that wasn't asked for
 - If user asks "can I use X?" answer yes/no + one key reason, nothing more
 - Only elaborate when user explicitly asks for more detail
+- VESDA-E detector models: VEU, VEP-A00-1P (1 pipe), VEP-A10-P (4 pipe), VES, VEA
+- VESDA-E common SKUs: VSP-963 (Aspirator), VSP-962 (Filter), VSP-960 (Mounting Bracket)
 - For detector selection questions based on area/room size:
   1. Find coverage specs for all detectors in the excerpts
   2. VESDA-E coverage areas are: VEU=6500m², VEP-A10-P=2000m², VES=2000m², VEA=3345m²
@@ -834,7 +851,6 @@ app.post("/feedback", async (req, res) => {
 // OTHER ROUTES
 // ─────────────────────────────────────────────
 app.get("/documents", (_, res) => res.json({ documents: getIndexedDocuments() }));
-app.get("/documents", (_, res) => res.json({ documents: getIndexedDocuments() }));
 
 app.delete("/documents/:filename", (req, res) => {
   const filename = decodeURIComponent(req.params.filename);
@@ -850,9 +866,6 @@ app.get("/health", (_, res) => res.json({ status: "ok", documents: getIndexedDoc
 // SERVE FRONTEND
 // ─────────────────────────────────────────────
 const FRONTEND_PATH = path.join(__dirname, "public");
-console.log(`[DEBUG] __dirname: ${__dirname}`);
-console.log(`[DEBUG] FRONTEND_PATH: ${FRONTEND_PATH}`);
-console.log(`[DEBUG] Frontend exists: ${fs.existsSync(FRONTEND_PATH)}`);
 if (fs.existsSync(FRONTEND_PATH)) {
   app.use(express.static(FRONTEND_PATH));
   app.get("*", (_, res) => {
@@ -866,8 +879,5 @@ if (fs.existsSync(FRONTEND_PATH)) {
 app.listen(PORT, async () => {
   console.log(`\n[OK] Field Manual RAG Server v3 on http://localhost:${PORT}`);
   console.log(`   API Key: ${process.env.ANTHROPIC_API_KEY ? "Set" : "MISSING"}`);
-  console.log(`[DEBUG] __dirname: ${__dirname}`);
-  console.log(`[DEBUG] FRONTEND_PATH: ${FRONTEND_PATH}`);
-  console.log(`[DEBUG] Frontend exists: ${fs.existsSync(FRONTEND_PATH)}`);
   await autoLoadManuals();
 });
