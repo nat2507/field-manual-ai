@@ -14,6 +14,8 @@ const vectorStore = [];
 const sectionIndex = [];
 
 const VECTORS_FILE = process.env.VECTORS_FILE || "C:\\manuals\\vectors.json";
+console.log(`[DEBUG] VECTORS_FILE env: ${process.env.VECTORS_FILE}`);
+console.log(`[DEBUG] VECTORS_FILE actual: ${VECTORS_FILE}`);
 
 // ─────────────────────────────────────────────
 // VECTOR PERSISTENCE
