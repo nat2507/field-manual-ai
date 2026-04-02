@@ -866,5 +866,8 @@ if (fs.existsSync(FRONTEND_PATH)) {
 app.listen(PORT, async () => {
   console.log(`\n[OK] Field Manual RAG Server v3 on http://localhost:${PORT}`);
   console.log(`   API Key: ${process.env.ANTHROPIC_API_KEY ? "Set" : "MISSING"}`);
+  console.log(`[DEBUG] __dirname: ${__dirname}`);
+  console.log(`[DEBUG] FRONTEND_PATH: ${FRONTEND_PATH}`);
+  console.log(`[DEBUG] Frontend exists: ${fs.existsSync(FRONTEND_PATH)}`);
   await autoLoadManuals();
 });
