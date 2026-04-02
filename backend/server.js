@@ -846,6 +846,18 @@ app.delete("/documents", (_, res) => { clearAll(); res.json({ success: true }); 
 
 app.get("/health", (_, res) => res.json({ status: "ok", documents: getIndexedDocuments().length }));
 
+// ─────────────────────────────────────────────
+// SERVE FRONTEND
+// ─────────────────────────────────────────────
+const FRONTEND_PATH = path.join(__dirname, "public");
+if (fs.existsSync(FRONTEND_PATH)) {
+  app.use(express.static(FRONTEND_PATH));
+  app.get("*", (_, res) => {
+    res.sendFile(path.join(FRONTEND_PATH, "index.html"));
+  });
+  console.log(`[OK] Serving frontend from ${FRONTEND_PATH}`);
+}
+
 app.listen(PORT, async () => {
   console.log(`\n[OK] Field Manual RAG Server v3 on http://localhost:${PORT}`);
   console.log(`   API Key: ${process.env.ANTHROPIC_API_KEY ? "Set" : "MISSING"}`);

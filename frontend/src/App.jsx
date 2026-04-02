@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-const API = "/api"; // proxied to backend via vite config
+const API = import.meta.env.VITE_API_URL || "/api";
 
 // ── Icons ──
 const WrenchIcon = () => (
