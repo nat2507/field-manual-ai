@@ -504,11 +504,25 @@ app.post("/chat", async (req, res) => {
       });
     }
 
+    // ── CHECK CORRECTIONS FIRST (before table search) ──
+    const correction = findCorrection(question);
+    if (correction) {
+      console.log(`   [CORRECTION] Using saved answer (${correction.confidence})`);
+      const disclaimer = correction.confidence === 'pending'
+        ? '\n\nNote: This answer is from a user correction pending admin review — please verify independently.'
+        : '';
+      return res.json({
+        answer: correction.answer + disclaimer,
+        correctionId: correction.savedAt,
+        confidence: correction.confidence,
+        sources: [{ filename: correction.filename || 'Saved correction', score: 100, preview: `${correction.confidence === 'verified' ? '✅ Verified' : '⚠️ Pending review'} correction` }]
+      });
+    }
+
     // ── TABLE SEARCH — only for direct part/SKU lookups ──
     // RAG handles everything else better
     const isDirectLookup = ['sku', 'part number', 'order code', 'spare part', 'part no']
       .some(w => question.toLowerCase().includes(w));
-
     if (isDirectLookup) {
       const tableMatches = searchTables(question);
       if (tableMatches && tableMatches.length > 0) {
@@ -525,21 +539,6 @@ app.post("/chat", async (req, res) => {
           });
         }
       }
-    }
-
-    // ── CHECK CORRECTIONS FIRST ──
-    const correction = findCorrection(question);
-    if (correction) {
-      console.log(`   [CORRECTION] Using saved answer (${correction.confidence})`);
-      const disclaimer = correction.confidence === 'pending'
-        ? '\n\nNote: This answer is from a user correction pending admin review — please verify independently.'
-        : '';
-      return res.json({
-        answer: correction.answer + disclaimer,
-        correctionId: correction.savedAt,
-        confidence: correction.confidence,
-        sources: [{ filename: correction.filename || 'Saved correction', score: 100, preview: `${correction.confidence === 'verified' ? '✅ Verified' : '⚠️ Pending review'} correction` }]
-      });
     }
 
     // ── DETECT MENTIONED DOCUMENT ──
