@@ -33,9 +33,11 @@ backend/test_output.json
 backend/test_faq.json
 backend/test-bookmarks.mjs* . t x t 
 
-# Manuals and data (too large for GitHub)
-C:/manuals/
-backend/manuals/
-*.pdf
+# Data files (stored in Railway volume)
+backend/manuals/vectors.json
+backend/manuals/tables.json
+backend/manuals/corrections.json
+C:/manuals/vectors.json
+C:/manuals/tables.json
  
  

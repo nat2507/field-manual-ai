@@ -27,7 +27,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 const MANUALS_DIR = process.env.MANUALS_DIR || "C:\\manuals";
-const CORRECTIONS_FILE = path.join(MANUALS_DIR, "corrections.json");
+const CORRECTIONS_FILE = process.env.CORRECTIONS_FILE || path.join(MANUALS_DIR, "corrections.json");
 const CONFIDENCE_THRESHOLD = 0.40;
 
 app.use(cors({ origin: "http://localhost:5173" }));
