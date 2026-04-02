@@ -48,7 +48,7 @@ const upload = multer({
 function extractPdfWithPython(pdfPath) {
   try {
     const scriptPath = path.join(__dirname, 'extract_pdf.py');
-    const result = execSync(`python "${scriptPath}" "${pdfPath}"`, {
+    const result = execSync(`python3 "${scriptPath}" "${pdfPath}"`, {
       maxBuffer: 100 * 1024 * 1024,
       encoding: 'buffer'
     });
