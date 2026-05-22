@@ -77,6 +77,8 @@ export default function App() {
   const historyRef = useRef([]); // keeps assistant/user history for multi-turn
   const lastDocRef = useRef(null); // tracks last document used
   const [correctingMsgIndex, setCorrectingMsgIndex] = useState(null);
+const [sidebarOpen, setSidebarOpen] = useState(false);
+const isMobile = window.innerWidth < 768;
   const [correctionText, setCorrectionText] = useState("");
   const [correctionStatus, setCorrectionStatus] = useState({});
   const [feedback, setFeedback] = useState({});
@@ -333,7 +335,20 @@ export default function App() {
         </div>
       )}
 
-      <div style={{ display: "flex", flex: 1, overflow: "hidden", maxHeight: "calc(100vh - 69px)" }}>
+      {/* ── Header ── */}
+      <div style={{
+        display: "flex", alignItems: "center", gap: 12, padding: "14px 20px",
+        borderBottom: "1px solid #1a1d26", background: "#0b0d13", flexShrink: 0,
+      }}>
+        {isMobile && (
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{
+            background: 'none', border: '1px solid #2a2d38', borderRadius: 8,
+            color: '#888', padding: '6px 10px', cursor: 'pointer', fontSize: 16,
+            fontFamily: 'inherit',
+          }}>
+            {sidebarOpen ? '✕' : '☰'}
+          </button>
+        )}
         <div style={{
           width: 40, height: 40, borderRadius: 10,
           background: "linear-gradient(135deg, #f59e0b, #b45309)",
@@ -371,10 +386,30 @@ export default function App() {
           onChange={(e) => handleFiles(e.target.files)} />
       </div>
 
-      <div style={{ display: "flex", flex: 1, overflow: "hidden", maxHeight: "calc(100vh - 69px)" }}>
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
 
         {/* ── Sidebar ── */}
-        <div style={{ width: 230, borderRight: "1px solid #1a1d26", background: "#0b0d13", display: "flex", flexDirection: "column", flexShrink: 0 }}>
+         {isMobile && sidebarOpen && (
+          <div onClick={() => setSidebarOpen(false)} style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.5)', zIndex: 10,
+          }} />
+        )}
+        <div style={{
+          width: isMobile ? 280 : 220,
+          position: isMobile ? 'fixed' : 'relative',
+          top: isMobile ? 0 : 'auto',
+          left: isMobile ? (sidebarOpen ? 0 : -300) : 'auto',
+          bottom: isMobile ? 0 : 'auto',
+          zIndex: isMobile ? 20 : 'auto',
+          transition: 'left 0.25s ease',
+          overflow: 'hidden',
+          borderRight: "1px solid #1a1d26",
+          background: "#0b0d13",
+          display: "flex",
+          flexDirection: "column",
+          flexShrink: 0,
+        }}>
           <div style={{ padding: "14px 14px 8px", fontSize: 10, color: "#333", letterSpacing: "0.1em" }}>INDEXED MANUALS</div>
 
           {/* Auto-load status */}
